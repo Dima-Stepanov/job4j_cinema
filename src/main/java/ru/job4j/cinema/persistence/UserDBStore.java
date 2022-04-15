@@ -29,20 +29,6 @@ public class UserDBStore implements Store<User> {
 
     public UserDBStore(BasicDataSource pool) {
         this.pool = pool;
-        initScheme();
-    }
-
-    /**
-     * Инициализация таблицы пользователей USERS.
-     */
-    private void initScheme() {
-        LOGGER.info("Инициализация таблицы users");
-        try (Statement statement = pool.getConnection().createStatement()) {
-            String sql = Files.readString(Path.of("db/scripts", "users.sql"));
-            statement.execute(sql);
-        } catch (Exception e) {
-            LOGGER.error("Не удалось выполнить операцию { }", e.getCause());
-        }
     }
 
     /**
@@ -182,9 +168,9 @@ public class UserDBStore implements Store<User> {
      * @throws SQLException exception.
      */
     private User getUser(ResultSet resultSet) throws SQLException {
-        return new User(resultSet.getInt(1),
-                resultSet.getString(2),
-                resultSet.getString(3),
-                resultSet.getString(4));
+        return new User(resultSet.getInt("user_id"),
+                resultSet.getString("user_name"),
+                resultSet.getString("email"),
+                resultSet.getString("phone"));
     }
 }

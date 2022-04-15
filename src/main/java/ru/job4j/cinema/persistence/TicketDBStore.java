@@ -30,23 +30,8 @@ public class TicketDBStore implements Store<Ticket> {
 
     private final BasicDataSource pool;
 
-
     public TicketDBStore(BasicDataSource pool) {
         this.pool = pool;
-        initScheme();
-    }
-
-    /**
-     * Инициализация таблицы билетов TICKET.
-     */
-    private void initScheme() {
-        LOGGER.info("Инициализация таблицы ticket");
-        try (Statement statement = pool.getConnection().createStatement()) {
-            String sql = Files.readString(Path.of("db/scripts", "ticket.sql"));
-            statement.execute(sql);
-        } catch (Exception e) {
-            LOGGER.error("Не удалось выполнить операцию { }", e.getCause());
-        }
     }
 
     /**

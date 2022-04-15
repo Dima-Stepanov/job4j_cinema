@@ -164,7 +164,7 @@ public class SessionDBStore implements Store<Session> {
      * @throws SQLException exception.
      */
     private Session getSession(ResultSet resultSet) throws SQLException {
-        return new Session(resultSet.getInt(1),
-                resultSet.getString(2));
+        return new Session(resultSet.getInt("session_id"),
+                resultSet.getString("session_name"));
     }
 }

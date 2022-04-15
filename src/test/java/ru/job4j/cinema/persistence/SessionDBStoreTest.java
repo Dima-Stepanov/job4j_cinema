@@ -72,6 +72,13 @@ public class SessionDBStoreTest {
     }
 
     @Test
+    public void whenUpdateSessionDbThenEmpty() {
+        Session session = new Session(0, "session");
+        SessionDBStore store = new SessionDBStore(pool);
+        assertThat(Optional.empty(), is(store.update(session)));
+    }
+
+    @Test
     public void whenSessionDbFindById() {
         Session session = new Session(0, "s1");
         Session session1 = new Session(0, "s2");
@@ -91,6 +98,13 @@ public class SessionDBStoreTest {
         Session delSession = store.delete(session).get();
         assertThat(session, is(delSession));
         assertThat(Optional.empty(), is(store.findById(session.getId())));
+    }
+
+    @Test
+    public void whenDeleteSessionDbThenEmpty() {
+        Session session = new Session(0, "s1");
+        SessionDBStore store = new SessionDBStore(pool);
+        assertThat(Optional.empty(), is(store.delete(session)));
     }
 
     @Test
