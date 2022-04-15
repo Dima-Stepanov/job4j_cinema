@@ -36,6 +36,11 @@ public class Main {
         } catch (IOException e) {
             LOGGER.error("Не удалось загрузить настройки { }", e.getCause());
         }
+        try {
+            Class.forName(config.getProperty("jdbc.driver"));
+        } catch (ClassNotFoundException e) {
+            LOGGER.error("Не удалось загрузить настройки { }", e.getCause());
+        }
         return config;
     }
 

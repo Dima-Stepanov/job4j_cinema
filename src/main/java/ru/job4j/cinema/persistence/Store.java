@@ -1,6 +1,7 @@
 package ru.job4j.cinema.persistence;
 
 import java.util.Collection;
+import java.util.List;
 import java.util.Optional;
 
 /**
@@ -23,5 +24,5 @@ public interface Store<T> {
 
     Optional<T> delete(T type);
 
-    Collection<T> findAll();
+    List<T> findAll();
 }

@@ -1,5 +1,7 @@
 ![ScreenShot](images/job4_logo.png)
 
+[![job4j_cinema](https://github.com/Dima-Stepanov/job4j_cinema/actions/workflows/maven-publish.yml/badge.svg)](https://github.com/Dima-Stepanov/job4j_cinema/actions/workflows/maven-publish.yml)
+
 <b>14.04.2024 </b><br>
 <a href=https://github.com/Dima-Stepanov>My github</a>
 

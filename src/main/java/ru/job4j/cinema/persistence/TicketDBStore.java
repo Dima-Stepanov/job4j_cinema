@@ -145,7 +145,19 @@ public class TicketDBStore implements Store<Ticket> {
      */
     @Override
     public Optional<Ticket> delete(Ticket ticket) {
-        return Optional.empty();
+        LOGGER.info("Удаление билета {}:{}", ticket.getId(), ticket.getSession().getName());
+        String sql = "DELETE FROM ticket WHERE ticket_id = ?;";
+        Optional<Ticket> result = Optional.empty();
+        try (Connection connection = pool.getConnection();
+             PreparedStatement statement = connection.prepareStatement(sql)) {
+            statement.setInt(1, ticket.getId());
+            if (statement.executeUpdate() > 0) {
+                result = Optional.of(ticket);
+            }
+        } catch (SQLException e) {
+            LOGGER.error("Не удалось выполнить операцию { }", e.getCause());
+        }
+        return result;
     }
 
     /**
@@ -154,7 +166,7 @@ public class TicketDBStore implements Store<Ticket> {
      * @return ArrayList.
      */
     @Override
-    public Collection<Ticket> findAll() {
+    public List<Ticket> findAll() {
         LOGGER.info("Создание списка всех билетов");
         List<Ticket> ticketList = new ArrayList<>();
         String sql = "SELECT * FROM ticket AS t "
@@ -178,8 +190,8 @@ public class TicketDBStore implements Store<Ticket> {
     /**
      * Возвращает Ticket из ResultSet
      *
-     * @param resultSet
-     * @return
+     * @param resultSet ResultSet
+     * @return User
      * @throws SQLException
      */
     private Ticket getTicket(ResultSet resultSet) throws SQLException {

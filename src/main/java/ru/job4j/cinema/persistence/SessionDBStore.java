@@ -31,20 +31,6 @@ public class SessionDBStore implements Store<Session> {
 
     public SessionDBStore(BasicDataSource pool) {
         this.pool = pool;
-        initScheme();
-    }
-
-    /**
-     * Инициализация таблицы сеансов SESSIONS.
-     */
-    private void initScheme() {
-        LOGGER.info("Инициализация таблицы sessions");
-        try (Statement statement = pool.getConnection().createStatement()) {
-            String sql = Files.readString(Path.of("db/scripts", "sessions.sql"));
-            statement.execute(sql);
-        } catch (Exception e) {
-            LOGGER.error("Не удалось выполнить операцию: { }", e.getCause());
-        }
     }
 
     /**
@@ -153,7 +139,7 @@ public class SessionDBStore implements Store<Session> {
      * @return ArrayList.
      */
     @Override
-    public Collection<Session> findAll() {
+    public List<Session> findAll() {
         LOGGER.info("Создание списка всех сеансов");
         List<Session> sessionList = new ArrayList<>();
         String sql = "SELECT * FROM sessions;";

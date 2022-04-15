@@ -157,7 +157,7 @@ public class UserDBStore implements Store<User> {
      * @return ArrayList.
      */
     @Override
-    public Collection<User> findAll() {
+    public List<User> findAll() {
         LOGGER.info("Создание списка всех пользователей");
         List<User> userList = new ArrayList<>();
         String sql = "SELECT * FROM users;";
