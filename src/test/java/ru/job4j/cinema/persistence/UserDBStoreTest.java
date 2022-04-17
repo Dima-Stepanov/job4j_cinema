@@ -6,10 +6,12 @@ import org.junit.AfterClass;
 import org.junit.BeforeClass;
 import org.junit.Test;
 import ru.job4j.cinema.Main;
+import ru.job4j.cinema.model.User;
 
 import java.sql.SQLException;
 import java.sql.Statement;
 
+import static org.hamcrest.Matchers.is;
 import static org.junit.Assert.*;
 
 /**
@@ -39,16 +41,21 @@ public class UserDBStoreTest {
     public void wipeTableUsers() throws SQLException {
         try (Statement statement = pool.getConnection().createStatement()) {
             statement.execute("DELETE FROM users;"
-                    + "ALTER TABLE users ALTER COLUMN users_id RESTART WITH 1");
+                    + "ALTER TABLE users ALTER COLUMN user_id RESTART WITH 1");
         }
     }
 
     @Test
-    public void create() {
+    public void whenCreateUser() {
+        User user = new User(0, "Dima", "mail@mail.ru", "112");
+        UserDBStore store = new UserDBStore(pool);
+        store.create(user);
+        User userInDb = store.findById(user.getId()).get();
+        assertThat(user.getName(), is(userInDb.getName()));
     }
 
     @Test
-    public void update() {
+    public void whenUpdate() {
     }
 
     @Test

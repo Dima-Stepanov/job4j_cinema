@@ -74,10 +74,10 @@ public class UserDBStore implements Store<User> {
         Optional<User> result = Optional.empty();
         try (Connection connection = pool.getConnection();
              PreparedStatement statement = connection.prepareStatement(sql)) {
-            statement.setInt(4, user.getId());
             statement.setString(1, user.getName());
             statement.setString(2, user.getEmail());
             statement.setString(3, user.getPhone());
+            statement.setInt(4, user.getId());
             if (statement.executeUpdate() > 0) {
                 result = Optional.of(user);
             }
@@ -96,7 +96,7 @@ public class UserDBStore implements Store<User> {
     @Override
     public Optional<User> findById(int id) {
         LOGGER.info("Поиск пользователя по ID:{}", id);
-        String sql = "SELECT * FROM users WHERE users_id = ?;";
+        String sql = "SELECT * FROM users WHERE user_id = ?;";
         Optional<User> result = Optional.empty();
         try (Connection connection = pool.getConnection();
              PreparedStatement statement = connection.prepareStatement(sql)) {
