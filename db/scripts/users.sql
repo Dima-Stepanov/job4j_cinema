@@ -3,5 +3,5 @@ create table if not exists users (
     user_id serial primary key,
     user_name varchar not null,
     email varchar not null constraint unique_email unique,
-    phone varchar not null constraint unique_email unique
+    phone varchar not null constraint unique_phone unique
 );

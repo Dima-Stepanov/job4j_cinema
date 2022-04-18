@@ -5,7 +5,7 @@ import org.junit.After;
 import org.junit.AfterClass;
 import org.junit.BeforeClass;
 import org.junit.Test;
-import ru.job4j.cinema.Main;
+import ru.job4j.cinema.CinemaApplication;
 import ru.job4j.cinema.model.Session;
 
 import java.sql.SQLException;
@@ -31,7 +31,7 @@ public class SessionDBStoreTest {
 
     @BeforeClass
     public static void initPool() {
-        pool = new Main().loadPool();
+        pool = new CinemaApplication().loadPool();
     }
 
     @AfterClass

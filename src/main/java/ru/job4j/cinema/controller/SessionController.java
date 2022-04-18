@@ -1,7 +1,9 @@
 package ru.job4j.cinema.controller;
 
 import org.springframework.stereotype.Controller;
+import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
+import ru.job4j.cinema.service.SessionService;
 
 /**
  * 3. Мидл
@@ -14,9 +16,16 @@ import org.springframework.web.bind.annotation.GetMapping;
  * @since 14.04.2022
  */
 @Controller
-public class IndexController {
-    @GetMapping("/index")
-    public String index() {
+public class SessionController {
+    private final SessionService serviceService;
+
+    public SessionController(SessionService serviceService) {
+        this.serviceService = serviceService;
+    }
+
+    @GetMapping("/")
+    public String index(Model model) {
+        model.addAttribute("sessions", serviceService.findAll());
         return "index";
     }
 }

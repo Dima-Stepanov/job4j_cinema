@@ -1,7 +1,11 @@
 package ru.job4j.cinema.service;
 
+import org.springframework.stereotype.Service;
 import ru.job4j.cinema.model.Session;
+import ru.job4j.cinema.persistence.SessionDBStore;
 import ru.job4j.cinema.persistence.Store;
+
+import java.util.List;
 
 /**
  * 3. Мидл
@@ -13,10 +17,15 @@ import ru.job4j.cinema.persistence.Store;
  * @author Dmitry Stepanov, user Dmitry
  * @since 15.04.2022
  */
+@Service
 public class SessionService {
     private final Store<Session> store;
 
-    public SessionService(Store<Session> store) {
+    public SessionService(SessionDBStore store) {
         this.store = store;
+    }
+
+    public List<Session> findAll() {
+        return store.findAll();
     }
 }

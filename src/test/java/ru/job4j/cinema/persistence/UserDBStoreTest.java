@@ -5,11 +5,13 @@ import org.junit.After;
 import org.junit.AfterClass;
 import org.junit.BeforeClass;
 import org.junit.Test;
-import ru.job4j.cinema.Main;
+import ru.job4j.cinema.CinemaApplication;
 import ru.job4j.cinema.model.User;
 
 import java.sql.SQLException;
 import java.sql.Statement;
+import java.util.List;
+import java.util.Optional;
 
 import static org.hamcrest.Matchers.is;
 import static org.junit.Assert.*;
@@ -29,7 +31,7 @@ public class UserDBStoreTest {
 
     @BeforeClass
     public static void initPool() {
-        pool = new Main().loadPool();
+        pool = new CinemaApplication().loadPool();
     }
 
     @AfterClass
@@ -55,18 +57,62 @@ public class UserDBStoreTest {
     }
 
     @Test
-    public void whenUpdate() {
+    public void whenUpdateThenOk() {
+        User user = new User(0, "Dima", "mail@mail.ru", "112");
+        UserDBStore store = new UserDBStore(pool);
+        store.create(user);
+        user.setName("Ivan");
+        User userInDb = store.update(user).get();
+        assertThat(user.getName(), is(userInDb.getName()));
     }
 
     @Test
-    public void findById() {
+    public void whenUpdateThenFail() {
+        User user = new User(0, "Dima", "mail@mail.ru", "112");
+        UserDBStore store = new UserDBStore(pool);
+        assertThat(Optional.empty(), is(store.update(user)));
     }
 
     @Test
-    public void delete() {
+    public void whenFindByIdThenOk() {
+        User user = new User(0, "Dima", "mail@mail.ru", "112");
+        UserDBStore store = new UserDBStore(pool);
+        store.create(user);
+        assertThat(user, is(store.findById(user.getId()).get()));
     }
 
     @Test
-    public void findAll() {
+    public void whenFindByIdThenFail() {
+        User user = new User(0, "Dima", "mail@mail.ru", "112");
+        UserDBStore store = new UserDBStore(pool);
+        store.create(user);
+        assertThat(Optional.empty(), is(store.findById(99)));
+    }
+
+    @Test
+    public void whenDeleteUserThenOk() {
+        User user = new User(0, "Dima", "mail@mail.ru", "112");
+        UserDBStore store = new UserDBStore(pool);
+        store.create(user);
+        assertThat(user, is(store.delete(user).get()));
+    }
+
+    @Test
+    public void whenDeleteUserThenFail() {
+        User user = new User(0, "Dima", "mail@mail.ru", "112");
+        UserDBStore store = new UserDBStore(pool);
+        assertThat(Optional.empty(), is(store.delete(user)));
+    }
+
+    @Test
+    public void whenFindAllThenEquals() {
+        User user = new User(0, "Dima", "mail@mail.ru", "112");
+        User user1 = new User(0, "Ivan", "ivan@mail.ru", "113");
+        UserDBStore store = new UserDBStore(pool);
+        store.create(user);
+        store.create(user1);
+        List<User> expected = List.of(user, user1);
+        List<User> result = store.findAll();
+        assertThat(expected, is(result));
     }
 }

@@ -1,5 +1,6 @@
 package ru.job4j.cinema.service;
 
+import org.springframework.stereotype.Service;
 import ru.job4j.cinema.model.Ticket;
 import ru.job4j.cinema.persistence.Store;
 import ru.job4j.cinema.persistence.TicketDBStore;
@@ -14,6 +15,7 @@ import ru.job4j.cinema.persistence.TicketDBStore;
  * @author Dmitry Stepanov, user Dmitry
  * @since 15.04.2022
  */
+@Service
 public class TicketService {
     private final Store<Ticket> store;
 

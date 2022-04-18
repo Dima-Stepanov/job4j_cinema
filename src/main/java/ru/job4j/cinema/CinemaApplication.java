@@ -22,15 +22,15 @@ import java.util.Properties;
  * @since 14.04.2022
  */
 @SpringBootApplication
-public class Main {
-    private static final Logger LOGGER = LoggerFactory.getLogger(Main.class.getName());
+public class CinemaApplication {
+    private static final Logger LOGGER = LoggerFactory.getLogger(CinemaApplication.class.getName());
 
     private Properties loadDbProperties() {
         LOGGER.info("Загрузка настроек приложения");
         Properties config = new Properties();
         try (BufferedReader io = new BufferedReader(
                 new InputStreamReader(
-                        Main.class.getClassLoader().getResourceAsStream(
+                        CinemaApplication.class.getClassLoader().getResourceAsStream(
                                 "db.properties")))) {
             config.load(io);
         } catch (IOException e) {
@@ -59,7 +59,7 @@ public class Main {
     }
 
     public static void main(String[] args) {
-        SpringApplication.run(Main.class, args);
-        System.out.println("Go to http://localhost:8080/index");
+        SpringApplication.run(CinemaApplication.class, args);
+        System.out.println("Go to http://localhost:8080/");
     }
 }

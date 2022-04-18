@@ -3,13 +3,11 @@ package ru.job4j.cinema.persistence;
 import org.apache.commons.dbcp2.BasicDataSource;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.stereotype.Repository;
 import ru.job4j.cinema.model.User;
 
-import java.nio.file.Files;
-import java.nio.file.Path;
 import java.sql.*;
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.List;
 import java.util.Optional;
 
@@ -23,6 +21,7 @@ import java.util.Optional;
  * @author Dmitry Stepanov, user Dmitry
  * @since 14.04.2022
  */
+@Repository
 public class UserDBStore implements Store<User> {
     private static final Logger LOGGER = LoggerFactory.getLogger(UserDBStore.class.getName());
     private final BasicDataSource pool;
@@ -121,7 +120,7 @@ public class UserDBStore implements Store<User> {
     @Override
     public Optional<User> delete(User user) {
         LOGGER.info("Удаление пользователя {}:{}", user.getId(), user.getEmail());
-        String sql = "DELETE FROM users WHERE users_id = ? AND email = ? AND phone = ?;";
+        String sql = "DELETE FROM users WHERE user_id = ? AND email = ? AND phone = ?;";
         Optional<User> result = Optional.empty();
         try (Connection connection = pool.getConnection();
              PreparedStatement statement = connection.prepareStatement(sql)) {
