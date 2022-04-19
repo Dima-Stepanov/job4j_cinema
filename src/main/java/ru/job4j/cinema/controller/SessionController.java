@@ -12,6 +12,7 @@ import ru.job4j.cinema.service.SessionService;
 
 import java.util.HashMap;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.ConcurrentLinkedQueue;
 import java.util.concurrent.ConcurrentSkipListSet;
 
 /**
@@ -41,7 +42,10 @@ public class SessionController {
     @GetMapping("/selectTicket/{sessionId}")
     public String formSelectTicket(Model model,
                                    @PathVariable("sessionId") int id) {
-        model.addAttribute("cinema", serviceService.findById(id).get());
+        Session session = serviceService.findById(id).get();
+        Ticket[] tickets = serviceService.getTickets(session);
+        model.addAttribute("cinema", session);
+        model.addAttribute("tickets", tickets);
         return "selectTicket";
     }
 

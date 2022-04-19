@@ -23,50 +23,31 @@
 </head>
 <body>
 <div class="container">
-    <nav class="navbar navbar-expand-lg navbar-light bg-light">
-        <a class="navbar-brand" href="#">Кинотеатр "ГОРИЗОНТ"</a>
-        <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNavAltMarkup"
-                aria-controls="navbarNavAltMarkup" aria-expanded="false" aria-label="Toggle navigation">
-            <span class="navbar-toggler-icon"></span>
-        </button>
-        <div class="collapse navbar-collapse" id="navbarNavAltMarkup">
-            <div class="navbar-nav">
-                <a class="nav-item nav-link active" th:href="@{/}">Главная<span
-                        class="sr-only">(current)</span></a>
-            </div>
-        </div>
-    </nav>
+    <header th:insert="blocks/header :: header"></header>
     <div class="row pt-3">
         <div class="card" style="width: 100%">
             <div class="card-header">
                 Выбор билета на фильм:
-                <td th:text="${cinema.name}"/>
+                <b th:text="${cinema.name}"/>
             </div>
             <div class="card-body">
-                <form th:action="@{/selectTicket}" method="POST" th:object="${ticket}">
-                    <input type="hidden" name="id" th:field="*{id}"/>
+                <form th:action="@{/selectTicket}" method="POST">
+                    <!--<input type="hidden" name="id" th:field="0"/>
                     <div class="form-group">
-                        <label for="name">Имя</label>
-                        <input type="text" class="form-control" name="name" id="name" th:field="*{name}">
-                    </div>
-                    <div class="form-group">
-                        <label for="description">Описание</label>
-                        <input type="text" class="form-control" name="description" id="description"
-                               th:field="*{description}">
-                    </div>
-                    <div class="form=group">
-                        <label for="city.id">Ряд</label>
-                        <select class="form-control" id="city.id" name="city.id">
-                            <option th:each="city : ${cities}" th:value="${city.id}" th:text="${city.name}"></option>
+                        <label for="row.row">Ряд</label>
+                        <select class="form-control" id="row.row" name="row.row">
+                            <option th:each="row:${tickets}" th:value="${row.row}" th:text="${row.row}"></option>
                         </select>
-                    </div>
-                    <div class="form=group">
-                        <label for="city.id">Место</label>
-                        <select class="form-control" id="city.id" name="city.id">
-                            <option th:each="city : ${cities}" th:value="${city.id}" th:text="${city.name}"></option>
+                    </div>-->
+                   <!-- <div class="form=group">
+                        <label for="cell.cell">Место</label>
+                        <select class="form-control" id="cell.cell" name="cell.cell">
+                            <option th:each="cell : ${tickets}" th:value="${cell.cell}" th:text="${cell.cell}"></option>
                         </select>
+                    </div>-->
+                    <div class="form-group pt-3">
+                        <button type="submit" class="btn btn-primary">Купить</button>
                     </div>
-                    <button type="submit" class="btn btn-primary">Купить</button>
                 </form>
             </div>
         </div>

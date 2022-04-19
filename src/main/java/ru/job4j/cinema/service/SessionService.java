@@ -2,6 +2,8 @@ package ru.job4j.cinema.service;
 
 import org.springframework.stereotype.Service;
 import ru.job4j.cinema.model.Session;
+import ru.job4j.cinema.model.Ticket;
+import ru.job4j.cinema.model.User;
 import ru.job4j.cinema.persistence.SessionDBStore;
 import ru.job4j.cinema.persistence.Store;
 
@@ -23,8 +25,9 @@ import java.util.concurrent.ConcurrentSkipListSet;
 @Service
 public class SessionService {
     private final Store<Session> store;
-    private final Map<Session,
-            ConcurrentHashMap<Integer, ConcurrentLinkedQueue<Integer>>> selectTicket = new ConcurrentHashMap<>();
+    private static final Integer ROW = 5;
+    private static final Integer CELL = 5;
+    private final Map<Session, Ticket[]> tickets = new ConcurrentHashMap<>();
 
     public SessionService(SessionDBStore store) {
         this.store = store;
@@ -32,28 +35,24 @@ public class SessionService {
     }
 
     private void initTicket() {
-        int row = 5;
-        int cell = 5;
         List<Session> sessions = store.findAll();
         for (Session session : sessions) {
-            this.selectTicket.computeIfAbsent(session, s -> {
-                ConcurrentHashMap<Integer, ConcurrentLinkedQueue<Integer>> rows = new ConcurrentHashMap<>();
-                for (int i = 1; i <= row; i++) {
-                    rows.computeIfAbsent(i, k -> {
-                        ConcurrentLinkedQueue<Integer> cells = new ConcurrentLinkedQueue<>();
-                        for (int j = 1; j <= cell; j++) {
-                            cells.add(j);
-                        }
-                        return cells;
-                    });
+            tickets.computeIfAbsent(session, k -> {
+                Ticket[] ticket = new Ticket[ROW * CELL];
+                int step = 0;
+                for (int i = 1; i <= ROW; i++) {
+                    for (int j = 1; j <= CELL; j++) {
+                        ticket[step++] = new Ticket(0, k, i , j, null);
+                    }
                 }
-                return rows;
+                return ticket;
             });
         }
+
     }
 
-    public ConcurrentHashMap<Integer, ConcurrentLinkedQueue<Integer>> findAllTicket(Session session) {
-        return this.selectTicket.get(session);
+    public Ticket[] getTickets(Session session) {
+        return tickets.get(session);
     }
 
     public Optional<Session> findById(int id) {
@@ -62,15 +61,5 @@ public class SessionService {
 
     public List<Session> findAll() {
         return store.findAll();
-    }
-
-    public void test() {
-        Session session = new Session(0, "ddd");
-        ConcurrentHashMap<Integer, ConcurrentLinkedQueue<Integer>> l = findAllTicket(session);
-        for (ConcurrentLinkedQueue<Integer> element : l.values()) {
-            for (Integer i : element) {
-                System.out.println(i);
-            }
-        }
     }
 }
