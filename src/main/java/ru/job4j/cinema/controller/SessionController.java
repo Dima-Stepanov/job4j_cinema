@@ -6,14 +6,12 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
-import ru.job4j.cinema.model.Session;
 import ru.job4j.cinema.model.Ticket;
 import ru.job4j.cinema.service.SessionService;
+import ru.job4j.cinema.service.TicketService;
 
-import java.util.HashMap;
-import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.ConcurrentLinkedQueue;
-import java.util.concurrent.ConcurrentSkipListSet;
+import java.util.List;
+import java.util.Map;
 
 /**
  * 3. Мидл
@@ -27,31 +25,35 @@ import java.util.concurrent.ConcurrentSkipListSet;
  */
 @Controller
 public class SessionController {
-    private final SessionService serviceService;
+    private final SessionService sessionService;
+    private final TicketService ticketService;
 
-    public SessionController(SessionService serviceService) {
-        this.serviceService = serviceService;
+    public SessionController(SessionService sessionService, TicketService ticketService) {
+        this.sessionService = sessionService;
+        this.ticketService = ticketService;
     }
 
     @GetMapping("/")
     public String index(Model model) {
-        model.addAttribute("sessions", serviceService.findAll());
+        model.addAttribute("sessions", sessionService.findAll());
         return "index";
     }
 
-    @GetMapping("/selectTicket/{sessionId}")
-    public String formSelectTicket(Model model,
-                                   @PathVariable("sessionId") int id) {
-        Session session = serviceService.findById(id).get();
-        Ticket[] tickets = serviceService.getTickets(session);
-        model.addAttribute("cinema", session);
-        model.addAttribute("tickets", tickets);
-        return "selectTicket";
+    @GetMapping("/ticketRow/{sessionId}")
+    public String formTicket(Model model,
+                             @PathVariable("sessionId") int sessionId) {
+        if (sessionService.findById(sessionId).isEmpty()) {
+            return "redirect:/";
+        }
+        Map<Integer, List<Ticket>> freeTicket = ticketService.findFreeTicketSession(sessionId);
+        model.addAttribute("cinema", sessionService.findById(sessionId).get());
+        model.addAttribute("rows", freeTicket);
+        return "ticketRow";
     }
 
-    @PostMapping("/selectTicket")
-    public String selectTicket(@ModelAttribute Ticket ticket) {
-        return "redirect:index";
+    @PostMapping("/ticket")
+    public String ticket(@ModelAttribute Ticket ticket) {
+        return "redirect:/";
     }
 }
 

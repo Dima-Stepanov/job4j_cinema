@@ -10,9 +10,12 @@ import ru.job4j.cinema.model.Session;
 import ru.job4j.cinema.model.Ticket;
 import ru.job4j.cinema.model.User;
 
+import java.sql.Connection;
 import java.sql.SQLException;
 import java.sql.Statement;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 
 import static org.hamcrest.Matchers.is;
@@ -35,7 +38,7 @@ public class TicketDBStoreTest {
     public static void initPool() {
         pool = new CinemaApplication().loadPool();
         UserDBStore userDBStore = new UserDBStore(pool);
-        userDBStore.create(new User(1, "Ivan", "mail@mail.ru", "112"));
+        userDBStore.create(new User(0, "Ivan", "mail@mail.ru", "112"));
         SessionDBStore sessionDBStore = new SessionDBStore(pool);
         sessionDBStore.create(new Session(1, "Стыд"));
     }
@@ -47,7 +50,8 @@ public class TicketDBStoreTest {
 
     @After
     public void wipeTableUsers() throws SQLException {
-        try (Statement statement = pool.getConnection().createStatement()) {
+        try (Connection connection = pool.getConnection();
+             Statement statement = connection.createStatement()) {
             statement.execute("DELETE FROM ticket;"
                     + "ALTER TABLE ticket ALTER COLUMN ticket_id RESTART WITH 1");
         }
@@ -121,6 +125,52 @@ public class TicketDBStoreTest {
         store.create(ticket1);
         List<Ticket> expected = List.of(ticket, ticket1);
         List<Ticket> result = store.findAll();
+        assertThat(expected, is(result));
+    }
+
+    @Test
+    public void whenFindTicketSession() {
+        Ticket ticket = new Ticket(0, new Session(1, "Стыд"),
+                1, 1,
+                new User(1, "Ivan", "mail@mail.ru", "112"));
+        Ticket ticket1 = new Ticket(0, new Session(1, "Стыд"),
+                1, 2,
+                new User(1, "Ivan", "mail@mail.ru", "112"));
+        TicketDBStore store = new TicketDBStore(pool);
+        store.create(ticket);
+        store.create(ticket1);
+        Map<Integer, List<Ticket>> result = store.findTicketSession(1);
+        Map<Integer, List<Ticket>> expected = new HashMap<>();
+        List<Ticket> row1 = List.of(ticket, ticket1);
+        expected.put(1, row1);
+        assertThat(expected, is(result));
+    }
+
+    @Test
+    public void whenFindTicketTwoRowSession() {
+        Ticket ticket = new Ticket(0, new Session(1, "Стыд"),
+                1, 1,
+                new User(1, "Ivan", "mail@mail.ru", "112"));
+        Ticket ticket1 = new Ticket(0, new Session(1, "Стыд"),
+                1, 2,
+                new User(1, "Ivan", "mail@mail.ru", "112"));
+        Ticket ticket2 = new Ticket(0, new Session(1, "Стыд"),
+                5, 1,
+                new User(1, "Ivan", "mail@mail.ru", "112"));
+        Ticket ticket3 = new Ticket(0, new Session(1, "Стыд"),
+                5, 2,
+                new User(1, "Ivan", "mail@mail.ru", "112"));
+        TicketDBStore store = new TicketDBStore(pool);
+        store.create(ticket);
+        store.create(ticket1);
+        store.create(ticket2);
+        store.create(ticket3);
+        Map<Integer, List<Ticket>> result = store.findTicketSession(1);
+        Map<Integer, List<Ticket>> expected = new HashMap<>();
+        List<Ticket> row1 = List.of(ticket, ticket1);
+        List<Ticket> row5 = List.of(ticket2, ticket3);
+        expected.put(1, row1);
+        expected.put(5, row5);
         assertThat(expected, is(result));
     }
 }

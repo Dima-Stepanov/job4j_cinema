@@ -25,34 +25,9 @@ import java.util.concurrent.ConcurrentSkipListSet;
 @Service
 public class SessionService {
     private final Store<Session> store;
-    private static final Integer ROW = 5;
-    private static final Integer CELL = 5;
-    private final Map<Session, Ticket[]> tickets = new ConcurrentHashMap<>();
 
     public SessionService(SessionDBStore store) {
         this.store = store;
-        initTicket();
-    }
-
-    private void initTicket() {
-        List<Session> sessions = store.findAll();
-        for (Session session : sessions) {
-            tickets.computeIfAbsent(session, k -> {
-                Ticket[] ticket = new Ticket[ROW * CELL];
-                int step = 0;
-                for (int i = 1; i <= ROW; i++) {
-                    for (int j = 1; j <= CELL; j++) {
-                        ticket[step++] = new Ticket(0, k, i , j, null);
-                    }
-                }
-                return ticket;
-            });
-        }
-
-    }
-
-    public Ticket[] getTickets(Session session) {
-        return tickets.get(session);
     }
 
     public Optional<Session> findById(int id) {

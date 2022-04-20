@@ -24,7 +24,29 @@
 <body>
 <div class="container">
     <header th:insert="blocks/header :: header"></header>
-
+    <div class="row pt-3">
+        <div class="card" style="width: 100%">
+            <div class="card-header">
+                Выбор билета на фильм:
+                <b th:text="${cinema.name}"/>
+            </div>
+            <div class="card-body">
+                <form th:action="@{/ticketCell/}" method="GET">
+                    <input type="hidden" name="id" value="0">
+                    <div class="form-group">
+                        <label for="row">Выбор ряда</label>
+                        <select class="form-control" id="row" name="row">
+                            <option th:each="mapitem, state:${rows}"
+                                    th:value="${mapitem.key}"
+                                    th:text="${mapitem.key}">
+                            </option>
+                        </select>
+                    </div>
+                    <button type="submit" class="btn btn-success mt-3">Выбрать ряда</button>
+                </form>
+            </div>
+        </div>
+    </div>
 </div>
 </body>
 </html>

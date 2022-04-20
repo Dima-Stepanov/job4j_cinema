@@ -55,7 +55,7 @@ public class UserDBStore implements Store<User> {
                 }
             }
         } catch (SQLException e) {
-            LOGGER.error("Не удалось выполнить операцию { }", e.getCause());
+            LOGGER.error("Не удалось выполнить операцию {}", e.getCause());
         }
         return result;
     }

@@ -8,13 +8,8 @@ import ru.job4j.cinema.model.Session;
 import ru.job4j.cinema.model.Ticket;
 import ru.job4j.cinema.model.User;
 
-import java.nio.file.Files;
-import java.nio.file.Path;
 import java.sql.*;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
 
 /**
  * 3. Мидл
@@ -62,7 +57,7 @@ public class TicketDBStore implements Store<Ticket> {
                 }
             }
         } catch (SQLException e) {
-            LOGGER.error("Не удалось выполнить операцию { }", e.getCause());
+            LOGGER.error("Не удалось выполнить операцию {}", e.getMessage());
         }
         return result;
     }
@@ -89,7 +84,7 @@ public class TicketDBStore implements Store<Ticket> {
                 result = Optional.of(ticket);
             }
         } catch (SQLException e) {
-            LOGGER.error("Не удалось выполнить операцию { }", e.getCause());
+            LOGGER.error("Не удалось выполнить операцию {}", e.getMessage());
         }
         return result;
     }
@@ -119,7 +114,7 @@ public class TicketDBStore implements Store<Ticket> {
                 }
             }
         } catch (SQLException e) {
-            LOGGER.error("Не удалось выполнить операцию { }", e.getCause());
+            LOGGER.error("Не удалось выполнить операцию {}", e.getMessage());
         }
         return result;
     }
@@ -142,7 +137,7 @@ public class TicketDBStore implements Store<Ticket> {
                 result = Optional.of(ticket);
             }
         } catch (SQLException e) {
-            LOGGER.error("Не удалось выполнить операцию { }", e.getCause());
+            LOGGER.error("Не удалось выполнить операцию {}", e.getMessage());
         }
         return result;
     }
@@ -169,9 +164,46 @@ public class TicketDBStore implements Store<Ticket> {
                 }
             }
         } catch (SQLException e) {
-            LOGGER.error("Не удалось выполнить операцию { }", e.getCause());
+            LOGGER.error("Не удалось выполнить операцию {}", e.getMessage());
         }
         return ticketList;
+    }
+
+    /**
+     * Поиск купленных билетов на указанный сеанс по idSession.
+     * Key - row
+     * Value - List<cell>
+     *
+     * @param idSession Session id
+     * @return Map
+     */
+    public Map<Integer, List<Ticket>> findTicketSession(int idSession) {
+        LOGGER.info("Начала поиска билетов на сеанс {}", idSession);
+        Map<Integer, List<Ticket>> result = new HashMap<>();
+        String sql = "SELECT * FROM ticket AS t "
+                + "INNER JOIN users AS u "
+                + "USING (user_id) "
+                + "INNER JOIN sessions AS s "
+                + "USING (session_id) "
+                + "WHERE t.session_id = ?"
+                + "ORDER BY t.rowt ASC, t.cell ASC;";
+        try (Connection connection = pool.getConnection();
+             PreparedStatement statement = connection.prepareStatement(sql)) {
+            statement.setInt(1, idSession);
+            try (ResultSet resultSet = statement.executeQuery()) {
+                while (resultSet.next()) {
+                    Ticket ticket = getTicket(resultSet);
+                    result.putIfAbsent(ticket.getRow(), new ArrayList<>());
+                    result.computeIfPresent(ticket.getRow(), (k, v) -> {
+                        v.add(ticket);
+                        return v;
+                    });
+                }
+            }
+        } catch (SQLException e) {
+            LOGGER.error("Не удалось выполнить операцию {}", e.getMessage());
+        }
+        return result;
     }
 
     /**

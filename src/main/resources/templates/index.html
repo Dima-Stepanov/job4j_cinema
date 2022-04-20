@@ -36,7 +36,7 @@
             <tr th:each="cinema: ${sessions}">
                 <td th:text="${cinema.id}"/>
                 <td>
-                    <a th:href="@{|/selectTicket/${cinema.id}|}">
+                    <a th:href="@{|/ticketRow/${cinema.id}|}">
                         <i class="fa fe-edit"></i>
                         <span th:text="${cinema.name}"></span>
                     </a>
