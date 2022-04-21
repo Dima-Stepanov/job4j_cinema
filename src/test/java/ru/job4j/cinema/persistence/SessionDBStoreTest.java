@@ -8,6 +8,7 @@ import org.junit.Test;
 import ru.job4j.cinema.CinemaApplication;
 import ru.job4j.cinema.model.Session;
 
+import java.sql.Connection;
 import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.List;
@@ -41,7 +42,8 @@ public class SessionDBStoreTest {
 
     @After
     public void wipeTableUsers() throws SQLException {
-        try (Statement statement = pool.getConnection().createStatement()) {
+        try (Connection connection = pool.getConnection();
+             Statement statement = connection.createStatement()) {
             statement.execute("DELETE FROM sessions;"
                     + "ALTER TABLE sessions ALTER COLUMN session_id RESTART WITH 1");
         }

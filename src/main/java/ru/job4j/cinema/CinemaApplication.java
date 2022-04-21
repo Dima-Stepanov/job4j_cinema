@@ -53,7 +53,7 @@ public class CinemaApplication {
         pool.setUsername(config.getProperty("jdbc.username"));
         pool.setPassword(config.getProperty("jdbc.password"));
         pool.setMinIdle(5);
-        pool.setMaxIdle(10);
+        pool.setMaxIdle(8);
         pool.setMaxOpenPreparedStatements(100);
         return pool;
     }
