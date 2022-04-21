@@ -76,11 +76,11 @@ public class Ticket {
             return false;
         }
         Ticket ticket = (Ticket) o;
-        return id == ticket.id;
+        return row == ticket.row && cell == ticket.cell && Objects.equals(session, ticket.session);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(id);
+        return Objects.hash(session, row, cell);
     }
 }

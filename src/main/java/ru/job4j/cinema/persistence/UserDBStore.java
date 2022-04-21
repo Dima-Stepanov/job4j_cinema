@@ -55,7 +55,7 @@ public class UserDBStore implements Store<User> {
                 }
             }
         } catch (SQLException e) {
-            LOGGER.error("Не удалось выполнить операцию {}", e.getCause());
+            LOGGER.error("Не удалось выполнить операцию {}", e.getMessage());
         }
         return result;
     }
@@ -81,7 +81,7 @@ public class UserDBStore implements Store<User> {
                 result = Optional.of(user);
             }
         } catch (SQLException e) {
-            LOGGER.error("Не удалось выполнить операцию { }", e.getCause());
+            LOGGER.error("Не удалось выполнить операцию { }", e.getMessage());
         }
         return result;
     }
@@ -106,10 +106,37 @@ public class UserDBStore implements Store<User> {
                 }
             }
         } catch (SQLException e) {
-            LOGGER.error("Не удалось выполнить операцию { }", e.getCause());
+            LOGGER.error("Не удалось выполнить операцию { }", e.getMessage());
         }
         return result;
     }
+
+    /**
+     * Поиск пользователя по email.
+     *
+     * @param email String
+     * @param phone String
+     * @return Optional.
+     */
+    public Optional<User> findByEmailAndPhone(String email, String phone) {
+        LOGGER.info("Поиск пользователя по Email:{}", email);
+        String sql = "SELECT * FROM users WHERE email = ? AND phone = ?;";
+        Optional<User> result = Optional.empty();
+        try (Connection connection = pool.getConnection();
+             PreparedStatement statement = connection.prepareStatement(sql)) {
+            statement.setString(1, email);
+            statement.setString(2, phone);
+            try (ResultSet resultSet = statement.executeQuery()) {
+                if (resultSet.next()) {
+                    result = Optional.of(getUser(resultSet));
+                }
+            }
+        } catch (SQLException e) {
+            LOGGER.error("Не удалось выполнить операцию { }", e.getMessage());
+        }
+        return result;
+    }
+
 
     /**
      * Удаление пользователя.
@@ -131,7 +158,7 @@ public class UserDBStore implements Store<User> {
                 result = Optional.of(user);
             }
         } catch (SQLException e) {
-            LOGGER.error("Не удалось выполнить операцию { }", e.getCause());
+            LOGGER.error("Не удалось выполнить операцию { }", e.getMessage());
         }
         return result;
     }
@@ -154,7 +181,7 @@ public class UserDBStore implements Store<User> {
                 }
             }
         } catch (SQLException e) {
-            LOGGER.error("Не удалось выполнить операцию { }", e.getCause());
+            LOGGER.error("Не удалось выполнить операцию { }", e.getMessage());
         }
         return userList;
     }

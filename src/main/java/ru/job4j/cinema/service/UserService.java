@@ -3,6 +3,10 @@ package ru.job4j.cinema.service;
 import org.springframework.stereotype.Service;
 import ru.job4j.cinema.model.User;
 import ru.job4j.cinema.persistence.Store;
+import ru.job4j.cinema.persistence.UserDBStore;
+
+import java.util.List;
+import java.util.Optional;
 
 /**
  * 3. Мидл
@@ -16,9 +20,25 @@ import ru.job4j.cinema.persistence.Store;
  */
 @Service
 public class UserService {
-    private final Store<User> store;
+    private final UserDBStore store;
 
-    public UserService(Store<User> store) {
+    public UserService(UserDBStore store) {
         this.store = store;
+    }
+
+    public Optional<User> create(User user) {
+        return store.create(user);
+    }
+
+    public Optional<User> findById(int id) {
+        return store.findById(id);
+    }
+
+    public Optional<User> findByEmail(String email, String phone) {
+        return store.findByEmailAndPhone(email, phone);
+    }
+
+    public List<User> findAll() {
+        return store.findAll();
     }
 }

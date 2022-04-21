@@ -3,7 +3,7 @@ package ru.job4j.cinema.service;
 import org.springframework.stereotype.Service;
 import ru.job4j.cinema.model.Session;
 import ru.job4j.cinema.model.Ticket;
-import ru.job4j.cinema.persistence.Store;
+
 import ru.job4j.cinema.persistence.TicketDBStore;
 
 import java.util.*;
@@ -44,34 +44,56 @@ public class TicketService {
         return store.findAll();
     }
 
-    public Map<Integer, List<Ticket>> findTicketSession(int sessionId) {
+    /**
+     * Поиск билета по ID сеанса.
+     *
+     * @param sessionId
+     * @return
+     */
+    public Map<Integer, Map<Integer, Ticket>> findTicketSession(int sessionId) {
         return store.findTicketSession(sessionId);
     }
 
-    public Map<Integer, List<Ticket>> findFreeTicketSession(int sessionId) {
-        Map<Integer, List<Ticket>> result = initTicket(sessionId);
-        Map<Integer, List<Ticket>> allTicket = findTicketSession(sessionId);
+    /**
+     * Метод карту свободных билетов.
+     * Если билет хранится в базе данных значит он куплен.
+     *
+     * @param sessionId
+     * @return
+     */
+    public Map<Integer, Map<Integer, Ticket>> findFreeTicketSession(int sessionId) {
+        Map<Integer, Map<Integer, Ticket>> result = initTicket(sessionId);
+        Map<Integer, Map<Integer, Ticket>> allTicket = findTicketSession(sessionId);
         for (Integer key : allTicket.keySet()) {
-            result.computeIfPresent(key, (k, v) -> {
-                v.removeAll(allTicket.get(key));
-                return v;
-            });
+            for (Integer k : allTicket.get(key).keySet()) {
+                result.get(key).remove(k);
+            }
+            if (result.get(key).size() == 0) {
+                result.remove(key);
+            }
         }
         return result;
     }
 
-    private Map<Integer, List<Ticket>> initTicket(int sessionId) {
-        Map<Integer, List<Ticket>> result = new HashMap<>();
+    /**
+     * Заполняем карту пустыми билетами.
+     *
+     * @param sessionId
+     * @return
+     */
+    private Map<Integer, Map<Integer, Ticket>> initTicket(int sessionId) {
+        Map<Integer, Map<Integer, Ticket>> result = new HashMap<>();
         for (int i = 1; i <= ROW; i++) {
-            result.putIfAbsent(i, new ArrayList<>());
+            result.put(i, new HashMap<>());
             for (int j = 1; j <= CELL; j++) {
                 Ticket ticket = new Ticket(0, new Session(sessionId, null), i, j, null);
-                result.computeIfPresent(ticket.getRow(), (k, v) -> {
-                    v.add(ticket);
-                    return v;
-                });
+                result.get(i).putIfAbsent(j, ticket);
             }
         }
         return result;
+    }
+
+    public Optional<Ticket> findBySessionRowCell(int session_id, int row, int cell) {
+        return store.findBySessionRowCell(session_id, row, cell);
     }
 }

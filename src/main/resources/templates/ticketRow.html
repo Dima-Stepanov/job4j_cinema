@@ -31,14 +31,13 @@
                 <b th:text="${cinema.name}"/>
             </div>
             <div class="card-body">
-                <form th:action="@{/ticketCell/}" method="GET">
-                    <input type="hidden" name="id" value="0">
+                <form th:action="@{|/ticketCell/${cinema.id}|}">
                     <div class="form-group">
                         <label for="row">Выбор ряда</label>
                         <select class="form-control" id="row" name="row">
-                            <option th:each="mapitem, state:${rows}"
-                                    th:value="${mapitem.key}"
-                                    th:text="${mapitem.key}">
+                            <option th:each="row:${rows}"
+                                    th:value="${row}"
+                                    th:text="${row}">
                             </option>
                         </select>
                     </div>

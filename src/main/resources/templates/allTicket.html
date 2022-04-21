@@ -22,33 +22,34 @@
     <title>Кинотеатр "ГОРИЗОНТ"</title>
 </head>
 <body>
-<div class="container pt-3">
+<div class="container">
     <header th:insert="blocks/header :: header"></header>
     <div class="row">
-        <div class="card" style="width: 100%">
-            <div class="card-header">
-                Покупка билета на сеанс <br><b
-                    th:text="' <' + ${cinema.name} + '> Ряд : ' + ${ticket.row} + ' Место ' + ${ticket.cell}"/>
-            </div>
-            <div class="card-body">
-                <form th:action="@{|/saveTicket/${cinema.id}/${ticket.row}/${ticket.cell}|}" method="post">
-                    <input type="hidden" name="id" value="0">
-                    <div class="form-group">
-                        <label for="name">Имя</label>
-                        <input type="text" class="form-control" name="name" id="name">
-                    </div>
-                    <div class="form-group">
-                        <label for="email">Email</label>
-                        <input type="text" class="form-control" name="email" id="email">
-                    </div>
-                    <div class="form-group">
-                        <label for="phone">Телефон</label>
-                        <input type="text" class="form-control" name="phone" id="phone">
-                    </div>
-                    <button type="submit" class="btn btn-primary">Купить</button>
-                </form>
-            </div>
-        </div>
+        <table class="table">
+            <thead>
+            <tr>
+                <th scope="col">#</th>
+                <th scope="col">Название фильма</th>
+                <th scope="col">Ряд</th>
+                <th scope="col">Место</th>
+                <th scope="col">Посетитель</th>
+            </tr>
+            </thead>
+            <tbody>
+            <tr th:each="ticket: ${tickets}">
+                <td th:text="${ticket.id}"/>
+                <td>
+                    <a th:href="@{|/ticketRow/${ticket.session.id}|}">
+                        <i class="fa fe-edit"></i>
+                        <span th:text="${ticket.session.name}"></span>
+                    </a>
+                </td>
+                <td th:text="${ticket.row}"/>
+                <td th:text="${ticket.cell}"/>
+                <td th:text="${ticket.user.name}"/>
+            </tr>
+            </tbody>
+        </table>
     </div>
 </div>
 </body>

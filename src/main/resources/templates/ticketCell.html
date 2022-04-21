@@ -31,18 +31,18 @@
                 <b th:text="${cinema.name}"/>
             </div>
             <div class="card-body">
-                <form th:action="@{/ticket}" method="post">
-                    <input type="hidden" name="id" value="0">
+                <form th:action="@{|/loginPage/${cinema.id}/${row}|}">
                     <div class="form-group">
-                        <label for="row">Ряд</label>
-                        <select class="form-control" id="row" name="row">
-                            <option th:each="mapitem, state:${rows}"
-                                    th:value="${mapitem.key}"
-                                    th:text="${mapitem.key}">
+                        <h th:text="'Ряд : ' + *{row}"/>
+                        <label for="cell">Выбор места</label>
+                        <select class="form-control" id="cell" name="cell">
+                            <option th:each="key:${cells}"
+                                    th:value="${key}"
+                                    th:text="${key}">
                             </option>
                         </select>
                     </div>
-                    <button type="submit" class="btn btn-success mt-3">Купить</button>
+                    <button type="submit" class="btn btn-success mt-3">Выбрать места</button>
                 </form>
             </div>
         </div>

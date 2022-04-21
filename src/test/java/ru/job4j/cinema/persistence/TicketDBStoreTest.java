@@ -139,9 +139,9 @@ public class TicketDBStoreTest {
         TicketDBStore store = new TicketDBStore(pool);
         store.create(ticket);
         store.create(ticket1);
-        Map<Integer, List<Ticket>> result = store.findTicketSession(1);
-        Map<Integer, List<Ticket>> expected = new HashMap<>();
-        List<Ticket> row1 = List.of(ticket, ticket1);
+        Map<Integer, Map<Integer, Ticket>> result = store.findTicketSession(1);
+        Map<Integer, Map<Integer, Ticket>> expected = new HashMap<>();
+        Map<Integer, Ticket> row1 = Map.of(1, ticket, 2, ticket1);
         expected.put(1, row1);
         assertThat(expected, is(result));
     }
@@ -165,10 +165,10 @@ public class TicketDBStoreTest {
         store.create(ticket1);
         store.create(ticket2);
         store.create(ticket3);
-        Map<Integer, List<Ticket>> result = store.findTicketSession(1);
-        Map<Integer, List<Ticket>> expected = new HashMap<>();
-        List<Ticket> row1 = List.of(ticket, ticket1);
-        List<Ticket> row5 = List.of(ticket2, ticket3);
+        Map<Integer, Map<Integer, Ticket>> result = store.findTicketSession(1);
+        Map<Integer, Map<Integer, Ticket>> expected = new HashMap<>();
+        Map<Integer, Ticket> row1 = Map.of(1, ticket, 2, ticket1);
+        Map<Integer, Ticket> row5 = Map.of(1, ticket2, 2, ticket3);
         expected.put(1, row1);
         expected.put(5, row5);
         assertThat(expected, is(result));

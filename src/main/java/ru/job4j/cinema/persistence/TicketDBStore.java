@@ -97,7 +97,7 @@ public class TicketDBStore implements Store<Ticket> {
      */
     @Override
     public Optional<Ticket> findById(int id) {
-        LOGGER.info("Поиск сеанса по ID:{}", id);
+        LOGGER.info("Поиск билета по ID:{}", id);
         String sql = "SELECT * FROM ticket AS t "
                 + "INNER JOIN users AS u "
                 + "USING (user_id) "
@@ -177,9 +177,9 @@ public class TicketDBStore implements Store<Ticket> {
      * @param idSession Session id
      * @return Map
      */
-    public Map<Integer, List<Ticket>> findTicketSession(int idSession) {
+    public Map<Integer, Map<Integer, Ticket>> findTicketSession(int idSession) {
         LOGGER.info("Начала поиска билетов на сеанс {}", idSession);
-        Map<Integer, List<Ticket>> result = new HashMap<>();
+        Map<Integer, Map<Integer, Ticket>> result = new HashMap<>();
         String sql = "SELECT * FROM ticket AS t "
                 + "INNER JOIN users AS u "
                 + "USING (user_id) "
@@ -193,11 +193,8 @@ public class TicketDBStore implements Store<Ticket> {
             try (ResultSet resultSet = statement.executeQuery()) {
                 while (resultSet.next()) {
                     Ticket ticket = getTicket(resultSet);
-                    result.putIfAbsent(ticket.getRow(), new ArrayList<>());
-                    result.computeIfPresent(ticket.getRow(), (k, v) -> {
-                        v.add(ticket);
-                        return v;
-                    });
+                    result.putIfAbsent(ticket.getRow(), new HashMap<>());
+                    result.get(ticket.getRow()).put(ticket.getCell(), ticket);
                 }
             }
         } catch (SQLException e) {
@@ -205,6 +202,40 @@ public class TicketDBStore implements Store<Ticket> {
         }
         return result;
     }
+
+    /**
+     * Поиск билета по ID сеанса и номеру ряда места.
+     *
+     * @param session_id
+     * @param row
+     * @param cell
+     * @return
+     */
+    public Optional<Ticket> findBySessionRowCell(int session_id, int row, int cell) {
+        LOGGER.info("Поиск билета по сеансу:{}, ряду:{}, месту:{}", session_id, row, cell);
+        String sql = "SELECT * FROM ticket AS t "
+                + "INNER JOIN users AS u "
+                + "USING (user_id) "
+                + "INNER JOIN sessions AS s "
+                + "USING (session_id) "
+                + "WHERE t.session_id = ? AND t.rowt = ? AND t.cell = ?;";
+        Optional<Ticket> result = Optional.empty();
+        try (Connection connection = pool.getConnection();
+             PreparedStatement statement = connection.prepareStatement(sql)) {
+            statement.setInt(1, session_id);
+            statement.setInt(2, row);
+            statement.setInt(3, cell);
+            try (ResultSet resultSet = statement.executeQuery()) {
+                if (resultSet.next()) {
+                    result = Optional.of(getTicket(resultSet));
+                }
+            }
+        } catch (SQLException e) {
+            LOGGER.error("Не удалось выполнить операцию {}", e.getMessage());
+        }
+        return result;
+    }
+
 
     /**
      * Возвращает Ticket из ResultSet
