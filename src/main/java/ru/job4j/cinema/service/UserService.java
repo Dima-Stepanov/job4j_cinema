@@ -30,15 +30,19 @@ public class UserService {
         return store.create(user);
     }
 
+    public Optional<User> update(User user) {
+        return store.update(user);
+    }
+
     public Optional<User> findById(int id) {
         return store.findById(id);
     }
 
-    public Optional<User> findByEmail(String email, String phone) {
-        return store.findByEmailAndPhone(email, phone);
-    }
-
     public List<User> findAll() {
         return store.findAll();
+    }
+
+    public Optional<User> findUserByEmailAndPhone(User user) {
+        return store.findUserByEmailAndPhone(user.getEmail(), user.getPhone());
     }
 }

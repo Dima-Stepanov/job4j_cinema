@@ -11,6 +11,14 @@
                         class="sr-only">(current)</span></a>
                 <a class="nav-item nav-link active" th:href="@{/allTicket}">Купленные билеты<span
                         class="sr-only">(current)</span></a>
+                <a class="nav-item nav-link" th:if="${user.email == 'Гость'}" th:href="@{/userPage}">
+                    <span th:text="${user.name}"></span>
+                    <span> | Войти</span>
+                </a>
+                <a class="nav-item nav-link" th:if="${user.email != 'Гость'}" th:href="@{/userOut}">
+                    <span th:text="${user.name}"></span>
+                    <span> | Выйти</span>
+                </a>
             </div>
         </div>
     </nav>

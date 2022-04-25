@@ -30,6 +30,14 @@ public class SessionService {
         this.store = store;
     }
 
+    public Optional<Session> create(Session session) {
+        return store.create(session);
+    }
+
+    public Optional<Session> update(Session session) {
+        return store.update(session);
+    }
+
     public Optional<Session> findById(int id) {
         return store.findById(id);
     }

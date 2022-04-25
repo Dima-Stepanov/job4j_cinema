@@ -11,6 +11,7 @@ import ru.job4j.cinema.service.SessionService;
 import ru.job4j.cinema.service.TicketService;
 import ru.job4j.cinema.service.UserService;
 
+import javax.servlet.http.HttpSession;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -39,11 +40,14 @@ public class TicketController {
 
     @GetMapping("/ticketRow/{sessionId}")
     public String formTicketRow(Model model,
-                                @PathVariable("sessionId") int sessionId) {
-        if (sessionService.findById(sessionId).isEmpty()) {
-            return "redirect:/";
+                                @PathVariable("sessionId") int sessionId,
+                                HttpSession session) {
+        User user = (User) session.getAttribute("user");
+        if (user == null) {
+            user = new User(0, "Гость", "Гость", "Гость");
         }
-        Map<Integer, Map<Integer, Ticket>> freeTicketRow = ticketService.findFreeTicketSession(sessionId);
+        model.addAttribute("user", user);
+        Map<Integer, Map<Integer, Ticket>> freeTicketRow = ticketService.findFreeTicketSession(new Session(sessionId, null));
         model.addAttribute("cinema", sessionService.findById(sessionId).get());
         model.addAttribute("rows", freeTicketRow.keySet());
         return "ticketRow";
@@ -51,8 +55,15 @@ public class TicketController {
 
     @GetMapping("/ticketCell/{sessionId}")
     public String formTicketCell(Model model,
-                                 @PathVariable("sessionId") int sessionId, @RequestParam("row") int row) {
-        Map<Integer, Map<Integer, Ticket>> freeTicketCell = ticketService.findFreeTicketSession(sessionId);
+                                 @PathVariable("sessionId") int sessionId,
+                                 @RequestParam("row") int row,
+                                 HttpSession session) {
+        User user = (User) session.getAttribute("user");
+        if (user == null) {
+            user = new User(0, "Гость", "Гость", "Гость");
+        }
+        model.addAttribute("user", user);
+        Map<Integer, Map<Integer, Ticket>> freeTicketCell = ticketService.findFreeTicketSession(new Session(sessionId, null));
         model.addAttribute("cinema", sessionService.findById(sessionId).get());
         model.addAttribute("row", row);
         model.addAttribute("cells", freeTicketCell.get(row).keySet());
@@ -60,24 +71,35 @@ public class TicketController {
     }
 
     @GetMapping("/allTicket")
-    public String allTicket(Model model) {
-        model.addAttribute("tickets", ticketService.findAllTicket());
+    public String allTicket(Model model, HttpSession session) {
+        User user = (User) session.getAttribute("user");
+        if (user == null) {
+            user = new User(0, "Гость", "Гость", "Гость");
+        }
+        model.addAttribute("user", user);
+        model.addAttribute("tickets", ticketService.findTicketByUser(user));
         return "allTicket";
     }
 
-    @PostMapping("/saveTicket/{id}/{row}/{cell}")
+    @PostMapping("/saveTicket/{sessionId}/{row}/{cell}")
     public String saveTicket(@ModelAttribute User user,
-                             @PathVariable("id") int session_id,
+                             @PathVariable("sessionId") int sessionId,
                              @PathVariable("row") int row,
-                             @PathVariable("cell") int cell) {
-        if (userService.findByEmail(user.getEmail(), user.getPhone()).isEmpty()) {
-            userService.create(user);
-        } else {
-            user = userService.findByEmail(user.getEmail(), user.getPhone()).get();
+                             @PathVariable("cell") int cell,
+                             Model model,
+                             HttpSession session) {
+        Optional<User> regUser = userService.create(user);
+        if (regUser.isEmpty()) {
+            regUser = userService.findUserByEmailAndPhone(user);
         }
-        if (ticketService.findBySessionRowCell(session_id, row, cell).isEmpty()) {
-            Ticket ticket = new Ticket(0, new Session(session_id, ""), row, cell, user);
-            ticketService.create(ticket);
+        if (regUser.isEmpty()) {
+            return "redirect:/?failUser=true";
+        }
+        session.setAttribute("user", regUser.get());
+        model.addAttribute("user", regUser.get());
+        Optional<Ticket> ticket = ticketService.create(new Ticket(0, new Session(sessionId, ""), row, cell, regUser.get()));
+        if (ticket.isEmpty()) {
+            return "redirect:/?failTicket=true";
         }
         return "redirect:/allTicket";
     }

@@ -50,7 +50,8 @@ row INT NOT NULL,<br>
 cell INT NOT NULL,<br>
 user_id INT NOT NULL REFERENCES users(id)<br>
 );<br>
-
+Схема базы данных <br>
+![ScreenShot](images/sheme.png)<br>
 Создайте папку db и в ней разместите sql схем таблиц. Подумайте, какие поля тут нужно сделать уникальными.
 Загрузку базы сделать через liquibase.
 
@@ -68,6 +69,7 @@ CREATE CONSTRAINT ...
 5. Загрузите код в репозиторий. Оставьте ссылку на коммит.
 
 6. Переведите ответственного на Петра Арсентьева.
+
 
 
 

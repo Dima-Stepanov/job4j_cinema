@@ -22,34 +22,32 @@
     <title>Кинотеатр "ГОРИЗОНТ"</title>
 </head>
 <body>
-<div class="container">
+<div class="container pt-3">
     <header th:insert="blocks/header :: header"></header>
     <div class="row">
-        <div th:if="${failTicket}" class="alert alert-danger" role="alert">
-            Такой билет уже забронирован
+        <div class="card" style="width: 100%">
+            <div class="card-header">
+                Авторизация
+            </div>
+            <div class="card-body">
+                <div th:if="${fail}" class="alert alert-danger" role="alert">
+                    Почта или телефон указан не верно!
+                </div>
+                <form th:action="@{/userIn}" method="POST">
+                    <input type="hidden" name="id" value="0">
+                    <input type="hidden" name="name" value="">
+                    <div class="form-group">
+                        <label for="email">Email</label>
+                        <input type="text" class="form-control" name="email" id="email">
+                    </div>
+                    <div class="form-group">
+                        <label for="phone">Телефон</label>
+                        <input type="text" class="form-control" name="phone" id="phone">
+                    </div>
+                    <button type="submit" class="btn btn-primary">Войти</button>
+                </form>
+            </div>
         </div>
-        <div th:if="${failUser}" class="alert alert-danger" role="alert">
-            Такой пользователь уже существует
-        </div>
-        <table class="table">
-            <thead>
-            <tr>
-                <th scope="col">#</th>
-                <th scope="col">Название фильма</th>
-            </tr>
-            </thead>
-            <tbody>
-            <tr th:each="cinema: ${sessions}">
-                <td th:text="${cinema.id}"/>
-                <td>
-                    <a th:href="@{|/ticketRow/${cinema.id}|}">
-                        <i class="fa fe-edit"></i>
-                        <span th:text="${cinema.name}"></span>
-                    </a>
-                </td>
-            </tr>
-            </tbody>
-        </table>
     </div>
 </div>
 </body>

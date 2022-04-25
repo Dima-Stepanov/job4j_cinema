@@ -1,5 +1,6 @@
 package ru.job4j.cinema.model;
 
+import java.io.Serializable;
 import java.util.Objects;
 
 /**
@@ -12,7 +13,7 @@ import java.util.Objects;
  * @author Dmitry Stepanov, user Dmitry
  * @since 14.04.2022
  */
-public class User {
+public class User implements Serializable {
     private int id;
     private String name;
     private String email;

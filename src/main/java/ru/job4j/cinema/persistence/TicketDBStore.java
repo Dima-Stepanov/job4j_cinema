@@ -10,6 +10,7 @@ import ru.job4j.cinema.model.User;
 
 import java.sql.*;
 import java.util.*;
+import java.util.concurrent.ConcurrentHashMap;
 
 /**
  * 3. Мидл
@@ -179,7 +180,7 @@ public class TicketDBStore implements Store<Ticket> {
      */
     public Map<Integer, Map<Integer, Ticket>> findTicketSession(int idSession) {
         LOGGER.info("Начала поиска билетов на сеанс {}", idSession);
-        Map<Integer, Map<Integer, Ticket>> result = new HashMap<>();
+        Map<Integer, Map<Integer, Ticket>> result = new ConcurrentHashMap<>();
         String sql = "SELECT * FROM ticket AS t "
                 + "INNER JOIN users AS u "
                 + "USING (user_id) "
@@ -206,13 +207,13 @@ public class TicketDBStore implements Store<Ticket> {
     /**
      * Поиск билета по ID сеанса и номеру ряда места.
      *
-     * @param session_id
+     * @param sessionId
      * @param row
      * @param cell
      * @return
      */
-    public Optional<Ticket> findBySessionRowCell(int session_id, int row, int cell) {
-        LOGGER.info("Поиск билета по сеансу:{}, ряду:{}, месту:{}", session_id, row, cell);
+    public Optional<Ticket> findBySessionRowCell(int sessionId, int row, int cell) {
+        LOGGER.info("Поиск билета по сеансу:{}, ряду:{}, месту:{}", sessionId, row, cell);
         String sql = "SELECT * FROM ticket AS t "
                 + "INNER JOIN users AS u "
                 + "USING (user_id) "
@@ -222,7 +223,7 @@ public class TicketDBStore implements Store<Ticket> {
         Optional<Ticket> result = Optional.empty();
         try (Connection connection = pool.getConnection();
              PreparedStatement statement = connection.prepareStatement(sql)) {
-            statement.setInt(1, session_id);
+            statement.setInt(1, sessionId);
             statement.setInt(2, row);
             statement.setInt(3, cell);
             try (ResultSet resultSet = statement.executeQuery()) {
@@ -234,6 +235,34 @@ public class TicketDBStore implements Store<Ticket> {
             LOGGER.error("Не удалось выполнить операцию {}", e.getMessage());
         }
         return result;
+    }
+
+    /**
+     * Поиск билетов принадлежащих пользователю.
+     *
+     * @param user User.
+     * @return List.
+     */
+    public List<Ticket> findTicketByUser(User user) {
+        LOGGER.info("Начала поиска билетов пользователя {}", user.getEmail());
+        List<Ticket> ticketList = new ArrayList<>();
+        String sql = "SELECT * FROM ticket AS t "
+                + "INNER JOIN users AS u "
+                + "ON t.user_id = u.user_id AND t.user_id = ? "
+                + "INNER JOIN sessions AS s "
+                + "USING (session_id);";
+        try (Connection connection = pool.getConnection();
+             PreparedStatement statement = connection.prepareStatement(sql)) {
+            statement.setInt(1, user.getId());
+            try (ResultSet resultSet = statement.executeQuery()) {
+                while (resultSet.next()) {
+                    ticketList.add(getTicket(resultSet));
+                }
+            }
+        } catch (SQLException e) {
+            LOGGER.error("Не удалось выполнить операцию {}", e.getMessage());
+        }
+        return ticketList;
     }
 
 
